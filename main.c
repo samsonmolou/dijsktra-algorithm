@@ -263,6 +263,7 @@ ville* calculCoutMinimal(char pVilleDepart[50], graphe *pGraphe) {
     ptr = NULL;
     premiereVilleNonParcouru = NULL;
     premiereVilleParcouru = NULL;
+    villeNonParcouru = NULL;
     temp = NULL;
     ptr = NULL;
     parc = NULL;
@@ -313,13 +314,7 @@ ville* calculCoutMinimal(char pVilleDepart[50], graphe *pGraphe) {
         ptr = ptr->suiv;
     }
     //Fin d'initialisation
-    printf("\n__RECHERCHE DU PLUS COURT CHEMIN__\n");
-    ptr = premiereVilleNonParcouru;
-    while(ptr != NULL) {
-        afficheVille(ptr);
-        afficheVilleVoisine(ptr);
-        ptr = ptr->suiv;
-    }
+
     //Etape 2 : Recherche des distances minimales entre ville
     ptr = premiereVilleNonParcouru;
     parc = (ville*)malloc(sizeof(ville));
