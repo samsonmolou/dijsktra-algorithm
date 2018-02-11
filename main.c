@@ -6,7 +6,6 @@ typedef struct ville ville;
 typedef struct graphe graphe;
 
 struct ville {
-    int indice;
     char *nom_ville;
     int cout;
     ville *suiv;
@@ -29,7 +28,6 @@ int nombreVille(graphe *pGraphe);
 ville* rechercherVille(char pVille[50], graphe *pGraphe);
 ville* calculCoutMinimal(char pVilleDepart[50], graphe *pGraphe);
 ville* getVille(char pVille[50], graphe *pGraphe);
-int obtenirIndice(ville *pVille, graphe *pGraphe);
 ville* rechercheVilleOptimale(ville *pPremiereVilleNonParcouru);
 void miseAJourCout(ville* pPremiereVilleParcouru, ville* pPremiereVilleNonParcouru, ville* pDerniereVilleParcouru, graphe *pGraphe);
 ville* supprimerVille(ville* pVilleASupprimer, ville* pOuSupprimer);
@@ -101,7 +99,7 @@ int main()
     g = ajouterVilleVoisine("K", "F", 8, g);
     g = ajouterVilleVoisine("K", "G", 1, g);
 
-    printf("\n__AFFICHAGE DU GRAPHE___\n\nSOMMET -> VILLE VOISINE\n\n");
+    printf("\n__AFFICHAGE DU GRAPHE___\n\nVILLE -> VILLE VOISINE\n\n");
     afficheGraphe(g);
 
     printf("\n__FIN DE L'AFFICHAGE__\n");
@@ -147,7 +145,6 @@ graphe* ajouterVille(char pNomVille[50], graphe *pGraphe) {
     if(pGraphe == NULL) {
         ville *v = (ville*)malloc(sizeof(ville));
         v->cout = 0;
-        v->indice = 1;
         v->nom_ville = pNomVille;
         v->suiv = NULL;
         v->voisine = NULL;
@@ -159,7 +156,6 @@ graphe* ajouterVille(char pNomVille[50], graphe *pGraphe) {
     else {
         ville *v = (ville*)malloc(sizeof(ville));
         v->cout = 0;
-        v->indice = nombreVille(pGraphe) + 1;
         v->nom_ville = pNomVille;
         v->suiv = NULL;
         v->voisine = NULL;
@@ -196,7 +192,7 @@ void afficheVilleVoisine(ville *pVille) {
 
 /*Permet d'afficher une ville */
 void afficheVille(ville *pVille) {
-    printf("(%d,%s,%d)", pVille->indice, pVille->nom_ville, pVille->cout);
+    printf("(%s,%d)",pVille->nom_ville, pVille->cout);
 }
 
 /* Permet d'afficher un graphe */
@@ -227,7 +223,6 @@ graphe* ajouterVilleVoisine(char pVilleDepart[50], char pVilleVoisine[50], int p
 
     v->nom_ville = pVilleVoisine;
     tmp = rechercherVille(pVilleVoisine, pGraphe);
-    v->indice = tmp->indice;
     v->cout = pCout;
     v->voisine = NULL;
     v->suiv = NULL;
@@ -274,7 +269,6 @@ ville* calculCoutMinimal(char pVilleDepart[50], graphe *pGraphe) {
     //Ville parcouru = ville de départ par défaut
     villeParcouru = (ville*)malloc(sizeof(ville));
     villeParcouru->cout = villeDepart->cout;
-    villeParcouru->indice = villeDepart->indice;
     villeParcouru->nom_ville = villeDepart->nom_ville;
     villeParcouru->suiv = NULL;
     villeParcouru->voisine = NULL;
@@ -292,7 +286,6 @@ ville* calculCoutMinimal(char pVilleDepart[50], graphe *pGraphe) {
         if(villeNonParcouru == NULL) {
             villeNonParcouru = (ville*)malloc(sizeof(ville));
             villeNonParcouru->cout = distance;
-            villeNonParcouru->indice = ptr->indice;
             villeNonParcouru->nom_ville = ptr->nom_ville;
             if(distance != INT_MAX)
                 villeNonParcouru->voisine = villeParcouru;
@@ -309,7 +302,6 @@ ville* calculCoutMinimal(char pVilleDepart[50], graphe *pGraphe) {
                 tmp->voisine = villeParcouru;
             else
                 tmp->voisine = NULL;
-            //tmp->indice = obtenirIndice(tmp, pGraphe);
             villeNonParcouru->suiv = tmp;
             villeNonParcouru = tmp;
         }
@@ -321,7 +313,6 @@ ville* calculCoutMinimal(char pVilleDepart[50], graphe *pGraphe) {
     ptr = premiereVilleNonParcouru;
     parc = (ville*)malloc(sizeof(ville));
     parc->cout = premiereVilleNonParcouru->cout;
-    parc->indice = premiereVilleNonParcouru->indice;
     parc->nom_ville = premiereVilleNonParcouru->nom_ville;
     parc->suiv = premiereVilleNonParcouru->suiv;
     parc->voisine = premiereVilleNonParcouru;
@@ -370,16 +361,6 @@ int obtenirDistance(ville *pVilleDepart, ville *pVilleArrive) {
     }
     if(ptr == NULL)
         return INT_MAX; //Au cas ou les deux villes sont pas voisines
-}
-
-/*Permet d'obtenir l'indice d'une ville */
-int obtenirIndice(ville *pVille, graphe *pGraphe) {
-    ville *ptr;
-    ptr = pGraphe->premiereVille;
-    while(ptr != NULL && ptr->nom_ville != pVille->nom_ville) {
-        ptr = ptr->suiv;
-    }
-    return ptr->indice;
 }
 
 /* Recherche la ville la plus proche parmi la liste des villes non parcouru */
