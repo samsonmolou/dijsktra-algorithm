@@ -22,12 +22,13 @@ void afficheVille(ville *pVille);
 void afficheGraphe(graphe *pGraphe);
 void afficheListeVille(ville *pVille);
 void afficheVilleVoisine(ville *pVille);
+void afficheCheminPlusCourt(char pVilleDepart[50], char pVilleArrive[50], ville *pVille);
 graphe* creerGraphe();
 graphe* ajouterVille(char pNomVille[50], graphe *pGraphe);
 graphe* ajouterVilleVoisine(char pVilleDepart[50], char pVilleVoisine[50], int pCout, graphe* pGraphe);
 int nombreVille(graphe *pGraphe);
 ville* rechercherVille(char pVille[50], graphe *pGraphe);
-void calculCoutMinimal(char pVilleDepart[50], graphe *pGraphe);
+ville* calculCoutMinimal(char pVilleDepart[50], graphe *pGraphe);
 ville* getVille(char pVille[50], graphe *pGraphe);
 int obtenirIndice(ville *pVille, graphe *pGraphe);
 ville* rechercheVilleOptimale(ville *pPremiereVilleNonParcouru);
@@ -100,11 +101,24 @@ int main()
     g = ajouterVilleVoisine("K", "F", 8, g);
     g = ajouterVilleVoisine("K", "G", 1, g);
 
+    printf("\n__AFFICHAGE DU GRAPHE___\n\n");
     afficheGraphe(g);
 
-    calculCoutMinimal("A", g);
+    printf("\n__FIN DE L'AFFICHAGE__\n");
 
-    //afficheListeVille(v);
+    ville *cheminMinimal = calculCoutMinimal("A", g);
+
+    printf("\n__AFFICHAGE DU COUT MINIMAL ENTRE LA VILLE A ET LES AUTRES__\n\n");
+    afficheListeVille(cheminMinimal);
+
+    printf("\n__FIN DE L'AFFICHAGE__\n");
+
+    printf("\n\n__AFFICHAGE DU PLUS COURT CHEMIN ENTRE A ET B__\n");
+
+    afficheCheminPlusCourt("A", "B", cheminMinimal); //Affiche le chemin le plus court entre A et B
+    printf("\n__FIN DE L'AFFICHAGE__\n");
+
+    return 0;
 }
 
 /* Permet d'avoir le nombre de ville dans un graphe */
@@ -241,7 +255,7 @@ ville* rechercherVille(char pVille[50], graphe *pGraphe) {
 }
 
 /* Permet de calculer la distance minimale d'une ville aux autres */
-void calculCoutMinimal(char pVilleDepart[50], graphe *pGraphe) {
+ville* calculCoutMinimal(char pVilleDepart[50], graphe *pGraphe) {
     ville *villeDepart, *villeNonParcouru, *villeParcouru, *ptr, *tmp, *temp, *premiereVilleNonParcouru, *premiereVilleParcouru, *parc;
     ville *villeOptimale;
     int distance = 0;
@@ -277,7 +291,10 @@ void calculCoutMinimal(char pVilleDepart[50], graphe *pGraphe) {
             villeNonParcouru->cout = distance;
             villeNonParcouru->indice = ptr->indice;
             villeNonParcouru->nom_ville = ptr->nom_ville;
-            villeNonParcouru->voisine = NULL;
+            if(distance != INT_MAX)
+                villeNonParcouru->voisine = villeParcouru;
+            else
+                villeNonParcouru->voisine = NULL;
             premiereVilleNonParcouru = villeNonParcouru;
         }
         else {
@@ -285,7 +302,10 @@ void calculCoutMinimal(char pVilleDepart[50], graphe *pGraphe) {
             tmp->nom_ville = ptr->nom_ville;
             tmp->suiv = NULL;
             tmp->cout = distance + villeParcouru->cout;
-            tmp->voisine = NULL;
+            if(distance + villeParcouru != INT_MAX)
+                tmp->voisine = villeParcouru;
+            else
+                tmp->voisine = NULL;
             //tmp->indice = obtenirIndice(tmp, pGraphe);
             villeNonParcouru->suiv = tmp;
             villeNonParcouru = tmp;
@@ -293,7 +313,13 @@ void calculCoutMinimal(char pVilleDepart[50], graphe *pGraphe) {
         ptr = ptr->suiv;
     }
     //Fin d'initialisation
-
+    printf("\n__RECHERCHE DU PLUS COURT CHEMIN__\n");
+    ptr = premiereVilleNonParcouru;
+    while(ptr != NULL) {
+        afficheVille(ptr);
+        afficheVilleVoisine(ptr);
+        ptr = ptr->suiv;
+    }
     //Etape 2 : Recherche des distances minimales entre ville
     ptr = premiereVilleNonParcouru;
     parc = (ville*)malloc(sizeof(ville));
@@ -305,7 +331,6 @@ void calculCoutMinimal(char pVilleDepart[50], graphe *pGraphe) {
     while(parc != NULL) {
         villeOptimale = NULL;
         villeOptimale = rechercheVilleOptimale(premiereVilleNonParcouru);
-
         temp = (ville*)malloc(sizeof(ville)); //Sauvegarder la ville optimale
         temp->nom_ville = villeOptimale->nom_ville;
         temp->suiv = NULL;
@@ -323,9 +348,8 @@ void calculCoutMinimal(char pVilleDepart[50], graphe *pGraphe) {
 
         parc = premiereVilleNonParcouru;
     }
-    printf("\n\nVille parcouru : ");
-    afficheListeVille(premiereVilleParcouru);
-    printf("FIN\n");
+
+    return premiereVilleParcouru;
 }
 
 /* Recupère une ville */
@@ -436,6 +460,7 @@ void miseAJourCout(ville* pVilleDepart, ville* pPremiereVilleNonParcouru, ville 
                 distance = derniereVilleParcouru->cout + disDerniereVille;
                 if(distance <= ptr->cout || ptr->cout == INT_MAX) {
                     ptr->cout = distance;
+                    ptr->voisine = pDerniereVilleParcouru;
                     ptr = ptr->suiv;
                     continue;
                 }
@@ -447,12 +472,21 @@ void miseAJourCout(ville* pVilleDepart, ville* pPremiereVilleNonParcouru, ville 
                     distance = derniereVilleParcouru->cout + disDerniereVille;
                     if(distance <= ptr->cout || ptr->cout == INT_MAX) {
                         ptr->cout = distance;
+                        ptr->voisine = derniereVilleParcouru;
                         ptr = ptr->suiv;
                         continue;
                     }
                 }
             }
         }
+        ptr = ptr->suiv;
+    }
+}
+
+void afficheCheminPlusCourt(char pVilleDepart[50], char pVilleArrive[50], ville *pVille) {
+    ville *ptr;
+    ptr = pVille;
+    while(ptr != NULL) {
         ptr = ptr->suiv;
     }
 }
