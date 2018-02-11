@@ -1,0 +1,6 @@
+# depslib dependency file v1.0
+1518311984 source:d:\bibliotheques\projets\seven\miaou\main.c
+	<stdio.h>
+	<stdlib.h>
+	<limits.h>
+
