@@ -22,7 +22,6 @@ void afficheVille(ville *pVille);
 void afficheGraphe(graphe *pGraphe);
 void afficheListeVille(ville *pVille);
 void afficheVilleVoisine(ville *pVille);
-void afficheCheminPlusCourt(char pVilleDepart[50], char pVilleArrive[50], ville *pVille);
 graphe* creerGraphe();
 graphe* ajouterVille(char pNomVille[50], graphe *pGraphe);
 graphe* ajouterVilleVoisine(char pVilleDepart[50], char pVilleVoisine[50], int pCout, graphe* pGraphe);
@@ -34,6 +33,7 @@ int obtenirIndice(ville *pVille, graphe *pGraphe);
 ville* rechercheVilleOptimale(ville *pPremiereVilleNonParcouru);
 void miseAJourCout(ville* pPremiereVilleParcouru, ville* pPremiereVilleNonParcouru, ville* pDerniereVilleParcouru, graphe *pGraphe);
 ville* supprimerVille(ville* pVilleASupprimer, ville* pOuSupprimer);
+ville* obtenirCheminPlusCourt(char pVilleDepart[50], char pVilleArrive[50], ville *pVille);
 
 int main()
 {
@@ -101,7 +101,7 @@ int main()
     g = ajouterVilleVoisine("K", "F", 8, g);
     g = ajouterVilleVoisine("K", "G", 1, g);
 
-    printf("\n__AFFICHAGE DU GRAPHE___\n\n");
+    printf("\n__AFFICHAGE DU GRAPHE___\n\nSOMMET -> VILLE VOISINE\n\n");
     afficheGraphe(g);
 
     printf("\n__FIN DE L'AFFICHAGE__\n");
@@ -111,12 +111,13 @@ int main()
     printf("\n__AFFICHAGE DU COUT MINIMAL ENTRE LA VILLE A ET LES AUTRES__\n\n");
     afficheListeVille(cheminMinimal);
 
-    printf("\n__FIN DE L'AFFICHAGE__\n");
+    printf("\n\n__FIN DE L'AFFICHAGE__\n");
 
-    printf("\n\n__AFFICHAGE DU PLUS COURT CHEMIN ENTRE A ET B__\n");
+    printf("\n\n__AFFICHAGE DU PLUS COURT CHEMIN ENTRE A ET J__\n\n");
 
-    afficheCheminPlusCourt("A", "B", cheminMinimal); //Affiche le chemin le plus court entre A et B
-    printf("\n__FIN DE L'AFFICHAGE__\n");
+    ville *plusCourtChemin = obtenirCheminPlusCourt("A", "J", cheminMinimal); //Affiche le chemin le plus court entre A et B
+    afficheListeVille(plusCourtChemin);
+    printf("\n\n__FIN DE L'AFFICHAGE__\n");
 
     return 0;
 }
@@ -177,6 +178,7 @@ void afficheListeVille(ville *pVille) {
         printf(" -> ");
         ptr = ptr->suiv;
     }
+    printf("FIN");
 }
 
 /*Permet la liste des villes voisines d'une ville */
@@ -478,10 +480,32 @@ void miseAJourCout(ville* pVilleDepart, ville* pPremiereVilleNonParcouru, ville 
     }
 }
 
-void afficheCheminPlusCourt(char pVilleDepart[50], char pVilleArrive[50], ville *pVille) {
-    ville *ptr;
+ville* obtenirCheminPlusCourt(char pVilleDepart[50], char pVilleArrive[50], ville *pVille) {
+    ville *ptr, *villeArrive, *plusCourtChemin, *entetePlusCourtChemin;
+    plusCourtChemin = (ville*)malloc(sizeof(ville));
     ptr = pVille;
     while(ptr != NULL) {
+        if(ptr->nom_ville == pVilleArrive)
+            villeArrive = ptr;
         ptr = ptr->suiv;
     }
+    plusCourtChemin = villeArrive;
+    plusCourtChemin->suiv = NULL;
+    entetePlusCourtChemin = plusCourtChemin;
+    ptr = pVille;
+    while(ptr != NULL) {
+        if(ptr->nom_ville == pVilleArrive) {
+            plusCourtChemin->suiv = ptr->voisine;
+            plusCourtChemin = ptr->voisine;
+            plusCourtChemin->suiv = NULL;
+            if(ptr->voisine == NULL)
+                break;
+            pVilleArrive = ptr->voisine->nom_ville;
+            ptr = pVille;
+
+        }
+        ptr = ptr->suiv;
+    }
+
+    return entetePlusCourtChemin;
 }
