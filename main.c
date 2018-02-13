@@ -113,7 +113,7 @@ int main()
 
     printf("\n\n__AFFICHAGE DU PLUS COURT CHEMIN ENTRE A ET J__\n\n");
 
-    ville *plusCourtChemin = obtenirCheminPlusCourt("A", "J", cheminMinimal); //Affiche le chemin le plus court entre A et B
+    ville *plusCourtChemin = obtenirCheminPlusCourt("A", "I", cheminMinimal); //Affiche le chemin le plus court entre A et B
     afficheListeVille(plusCourtChemin);
     printf("\n\n__FIN DE L'AFFICHAGE__\n");
 
@@ -266,7 +266,7 @@ ville* calculCoutMinimal(char pVilleDepart[50], graphe *pGraphe) {
     parc = NULL;
 
     villeDepart = getVille(pVilleDepart, pGraphe);
-    //Ville parcouru = ville de départ par défaut
+    //Ville Parcouru = ville de départ par défaut
     villeParcouru = (ville*)malloc(sizeof(ville));
     villeParcouru->cout = villeDepart->cout;
     villeParcouru->nom_ville = villeDepart->nom_ville;
@@ -274,7 +274,7 @@ ville* calculCoutMinimal(char pVilleDepart[50], graphe *pGraphe) {
     villeParcouru->voisine = NULL;
     premiereVilleParcouru = villeParcouru;
 
-    //Initialisation de l'algotithme de Dijikstra
+    //Initialisation de l'algotithme de Dijkstra
     ptr = pGraphe->premiereVille;
     while(ptr != NULL) {
         if(ptr->nom_ville == villeParcouru->nom_ville) {
@@ -298,7 +298,7 @@ ville* calculCoutMinimal(char pVilleDepart[50], graphe *pGraphe) {
             tmp->nom_ville = ptr->nom_ville;
             tmp->suiv = NULL;
             tmp->cout = distance + villeParcouru->cout;
-            if(distance + villeParcouru != INT_MAX)
+            if(distance + villeParcouru->cout != INT_MAX)
                 tmp->voisine = villeParcouru;
             else
                 tmp->voisine = NULL;
@@ -361,9 +361,10 @@ int obtenirDistance(ville *pVilleDepart, ville *pVilleArrive) {
     }
     if(ptr == NULL)
         return INT_MAX; //Au cas ou les deux villes sont pas voisines
+
 }
 
-/* Recherche la ville la plus proche parmi la liste des villes non parcouru */
+/* Recherche la ville la plus proche parmi la liste des villes non Parcouru */
 ville* rechercheVilleOptimale(ville *pPremiereVilleNonParcouru) {
     ville* ptr, *villeOptimale;
     ptr = pPremiereVilleNonParcouru->suiv;
@@ -377,7 +378,7 @@ ville* rechercheVilleOptimale(ville *pPremiereVilleNonParcouru) {
     return villeOptimale;
 }
 
-/* Supprimer une ville de la liste des villes non parcouru */
+/* Supprimer une ville de la liste des villes non Parcouru */
 ville* supprimerVille(ville *pVilleASupprimer, ville* pOuSupprimer) {
     ville *ptr, *prec, *tmp;
 
@@ -425,10 +426,10 @@ void miseAJourCout(ville* pVilleDepart, ville* pPremiereVilleNonParcouru, ville 
     while(ptr != NULL) {
         derniereVilleParcouru = rechercherVille(pDerniereVilleParcouru->nom_ville, pGraphe);
         derniereVilleParcouru->cout = pDerniereVilleParcouru->cout;
-        //Distance entre la dernière ville et la ville actielle
+        //Distance entre la dernière ville et la ville actuelle
         disDerniereVille = obtenirDistance(derniereVilleParcouru, ptr);
         if(disDerniereVille != INT_MAX) {
-            //Il y un chemin entre la derniere ville parcouru et la ville actuelle
+            //Il y un chemin entre la derniere ville Parcouru et la ville actuelle
             tmp = rechercherVille(ptr->nom_ville, pGraphe);
             tmp->cout = ptr->cout;
             //Distance entre la ville actuelle et la ville de depart
@@ -444,7 +445,7 @@ void miseAJourCout(ville* pVilleDepart, ville* pPremiereVilleNonParcouru, ville 
                 }
             }
             else {
-                //Distance entre la derniere ville parcouru et la ville actuelle
+                //Distance entre la derniere ville Parcouru et la ville actuelle
                 disDerniereVille = obtenirDistance(derniereVilleParcouru, ptr);
                 if(disDerniereVille != INT_MAX) {
                     distance = derniereVilleParcouru->cout + disDerniereVille;
