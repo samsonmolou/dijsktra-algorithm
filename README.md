@@ -1,5 +1,5 @@
-# Algorithme-de-Dijsktra
-Implémentation de l'algorithme de Dijkstra en langage C.
+# Recherche du plus court chemin dans un graphe - Algorithme de Dijkstra
+Implémentation de l'algorithme de Dijkstra en langage C pour la recherche du plus court chemin entre deux villes dans un graphe
 
 ## Description
 
